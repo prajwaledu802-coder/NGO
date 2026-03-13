@@ -47,6 +47,8 @@ Create a Web Service for **backend-api**:
   - `PORT`
   - `GROQ_API_KEY`
 
+If Render logs mention `MONGO_URI is not configured`, your service is using an outdated backend config. Point the service to `backend-api` (or use `render.yaml`) and set Supabase variables above.
+
 Server startup is configured in `backend-api/src/index.js` with dotenv and default `PORT=10000`.
 
 ## Supabase Migration Scope
