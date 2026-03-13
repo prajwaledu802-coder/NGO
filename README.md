@@ -48,3 +48,12 @@ Create a Web Service for **backend-api**:
   - `GROQ_API_KEY`
 
 Server startup is configured in `backend-api/src/index.js` with dotenv and default `PORT=10000`.
+
+## Supabase Migration Scope
+
+The Supabase migration currently covers authentication and the core volunteer operations data paths:
+
+- auth
+- users / volunteers
+- events
+- resources
