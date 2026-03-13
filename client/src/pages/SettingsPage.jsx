@@ -16,7 +16,7 @@ const SettingsPage = () => {
       email: user?.email || '',
       skills: Array.isArray(user?.skills) ? user.skills.join(', ') : '',
     }),
-    [user?.email, user?.fullName, user?.name, user?.skills]
+    [user]
   );
   const [profileForm, setProfileForm] = useState(initialProfile);
 

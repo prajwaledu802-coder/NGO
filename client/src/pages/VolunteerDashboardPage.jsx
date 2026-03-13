@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Activity,
   Bell,
@@ -51,7 +51,7 @@ const VolunteerDashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const loadDashboard = () => {
+  const loadDashboard = useCallback(() => {
     if (!user?._id && !user?.id) return;
 
     setLoading(true);
@@ -131,11 +131,11 @@ const VolunteerDashboardPage = () => {
         }));
       })
       .finally(() => setAiLoading(false));
-  };
+  }, [user?._id, user?.id]);
 
   useEffect(() => {
     loadDashboard();
-  }, [user?._id, user?.id]);
+  }, [loadDashboard]);
 
   const topVolunteers = useMemo(() => leaderboard.slice(0, 8), [leaderboard]);
 

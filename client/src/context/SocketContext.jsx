@@ -123,7 +123,6 @@ export const SocketProvider = ({ children }) => {
 
   const value = useMemo(
     () => ({
-      socket: socketRef.current,
       connected,
       lastEvent,
       liveEvents,
