@@ -69,14 +69,14 @@ export default function Navbar() {
         {/* CTA Buttons */}
         <div className="hidden items-center gap-4 md:flex">
           <Link
-            to="/login?role=admin"
+            to="/admin"
             className="cursor-pointer text-sm font-medium text-text-secondary transition-colors duration-300 hover:text-text-primary"
           >
-            Admin Login
+            Admin Portal
           </Link>
           <motion.div whileHover={{ y: -2, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Link to="/register?role=volunteer" className="btn-primary block px-5 py-2.5 text-sm !bg-none !bg-accent-primary hover:!bg-accent-primary/90">
-              Volunteer Signup
+            <Link to="/volunteer" className="btn-primary block px-5 py-2.5 text-sm !bg-none !bg-accent-primary hover:!bg-accent-primary/90">
+              Volunteer Portal
             </Link>
           </motion.div>
         </div>
@@ -116,18 +116,18 @@ export default function Navbar() {
             <div className="my-2 h-px w-full bg-black/5" />
             <div className="flex flex-col gap-3 px-2 pb-2">
               <Link
-                to="/login?role=admin"
+                to="/admin"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="cursor-pointer rounded-lg px-2 py-2 text-center text-base font-medium text-text-primary transition-colors hover:bg-black/5"
               >
-                Admin Login
+                Admin Portal
               </Link>
               <Link
-                to="/register?role=volunteer"
+                to="/volunteer"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="btn-primary w-full text-center text-base !bg-none !bg-accent-primary"
               >
-                Volunteer Signup
+                Volunteer Portal
               </Link>
             </div>
           </motion.div>

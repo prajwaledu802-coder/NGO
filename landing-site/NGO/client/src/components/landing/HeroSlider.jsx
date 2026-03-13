@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { Link } from 'react-router-dom';
 import '../../pages/SliderLanding.css';
 
 const sliderData = [
@@ -316,10 +317,8 @@ export default function HeroSlider() {
                     </div>
 
                     <div className="actions-wrapper">
-                        <button className="slider-btn btn-icon cursor-pointer">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-                        </button>
-                        <button className="slider-btn btn-outline cursor-pointer">Learn More</button>
+                        <Link to="/admin" className="slider-btn btn-outline cursor-pointer">Admin Portal</Link>
+                        <Link to="/volunteer" className="slider-btn btn-outline cursor-pointer">Volunteer Portal</Link>
                     </div>
                 </div>
 
