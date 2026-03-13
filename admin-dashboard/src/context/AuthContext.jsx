@@ -69,16 +69,25 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    if (email === demoCredentials.admin.email && password === demoCredentials.admin.password) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = password.trim();
+
+    if (
+      normalizedEmail === demoCredentials.admin.email &&
+      normalizedPassword === demoCredentials.admin.password
+    ) {
       loginOfflineByRole('admin');
       return;
     }
-    if (email === demoCredentials.volunteer.email && password === demoCredentials.volunteer.password) {
+    if (
+      normalizedEmail === demoCredentials.volunteer.email &&
+      normalizedPassword === demoCredentials.volunteer.password
+    ) {
       loginOfflineByRole('volunteer');
       return;
     }
 
-    const { data } = await api.post('/auth/login', { email, password });
+    const { data } = await api.post('/auth/login', { email: normalizedEmail, password });
     localStorage.removeItem(OFFLINE_USER_KEY);
     localStorage.setItem('ngo_token', data.token);
     setUser(data.user);

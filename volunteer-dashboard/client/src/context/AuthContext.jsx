@@ -35,12 +35,18 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    if (email === demoCredentials.email && password === demoCredentials.password) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = password.trim();
+
+    if (
+      normalizedEmail === demoCredentials.email &&
+      normalizedPassword === demoCredentials.password
+    ) {
       loginAsDemo();
       return;
     }
 
-    const { data } = await api.post('/auth/login', { email, password });
+    const { data } = await api.post('/auth/login', { email: normalizedEmail, password });
     localStorage.setItem('ngo_token', data.token);
     localStorage.removeItem(DEMO_KEY);
     setUser(data.user);
