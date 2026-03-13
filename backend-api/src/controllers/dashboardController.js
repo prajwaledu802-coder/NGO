@@ -1,15 +1,13 @@
-import { Event } from '../models/Event.js';
-import { Resource } from '../models/Resource.js';
-import { User } from '../models/User.js';
+import { supabase } from '../config/supabase.js';
 
 export const getDashboardOverview = async (_req, res) => {
-  const [volunteers, events, resources] = await Promise.all([
-    User.find({ role: 'volunteer' }),
-    Event.find(),
-    Resource.find(),
+  const [{ data: volunteers = [] }, { data: events = [] }, { data: resources = [] }] = await Promise.all([
+    supabase.from('users').select('*').eq('role', 'volunteer'),
+    supabase.from('events').select('*'),
+    supabase.from('resources').select('*'),
   ]);
 
-  const totalHours = volunteers.reduce((sum, v) => sum + (v.hoursContributed || 0), 0);
+  const totalHours = volunteers.reduce((sum, v) => sum + (v.hours_contributed ?? v.hoursContributed ?? 0), 0);
   const availableResources = resources.filter((r) => r.status === 'available').length;
 
   const activitySeries = [
@@ -22,13 +20,13 @@ export const getDashboardOverview = async (_req, res) => {
     { name: 'Sun', volunteers: Math.max(1, Math.round(volunteers.length * 0.6)) },
   ];
 
-  const resourceSeries = resources.map((r) => ({ name: r.resourceName, quantity: r.quantity }));
+  const resourceSeries = resources.map((r) => ({ name: r.resource_name || r.resourceName, quantity: r.quantity }));
   const eventSeries = events
     .slice(-7)
     .map((event) => ({
-      name: event.title,
-      participants: Array.isArray(event.assignedVolunteers) ? event.assignedVolunteers.length : 0,
-      target: Math.max(1, Array.isArray(event.assignedVolunteers) ? event.assignedVolunteers.length + 2 : 2),
+      name: event.title || event.name,
+      participants: Array.isArray(event.assigned_volunteers) ? event.assigned_volunteers.length : 0,
+      target: Math.max(1, Array.isArray(event.assigned_volunteers) ? event.assigned_volunteers.length + 2 : 2),
     }));
 
   res.json({
@@ -43,7 +41,7 @@ export const getDashboardOverview = async (_req, res) => {
     eventSeries,
     recentEvents: events.slice(-5).reverse(),
     leaderboard: [...volunteers]
-      .sort((a, b) => (b.impactScore || 0) - (a.impactScore || 0))
+      .sort((a, b) => (b.impact_score ?? 0) - (a.impact_score ?? 0))
       .slice(0, 10),
   });
 };

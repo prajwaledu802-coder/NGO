@@ -1,108 +1,108 @@
-import { Event } from '../models/Event.js';
-import { Notification } from '../models/Notification.js';
-import { Task } from '../models/Task.js';
-import { User } from '../models/User.js';
+import { supabase } from '../config/supabase.js';
 import { emitRealtimeEvent } from '../services/socketService.js';
 
+const mapTask = (task) => ({
+  ...task,
+  _id: task.id,
+  assignedVolunteer: task.assigned_volunteer,
+  eventId: task.event_id,
+  createdBy: task.created_by,
+  createdAt: task.created_at,
+});
+
 export const getTasks = async (req, res) => {
-  const query = {};
+  let query = supabase.from('tasks').select('*').order('created_at', { ascending: false });
+  if (req.user.role !== 'admin') query = query.eq('assigned_volunteer', req.user._id);
+  if (req.query.eventId) query = query.eq('event_id', req.query.eventId);
 
-  if (req.user.role !== 'admin') {
-    query.assignedVolunteer = req.user._id;
-  }
-
-  if (req.query.eventId) {
-    query.eventId = req.query.eventId;
-  }
-
-  const tasks = await Task.find(query)
-    .populate('assignedVolunteer', 'name email status dutyStatus location skills')
-    .populate('eventId', 'title location date status')
-    .populate('createdBy', 'name email')
-    .sort({ createdAt: -1 });
-
-  res.json(tasks);
+  const { data: tasks = [], error } = await query;
+  if (error) return res.status(400).json({ message: error.message });
+  res.json(tasks.map(mapTask));
 };
 
 export const createTask = async (req, res) => {
   const { title, description, assignedVolunteer, eventId } = req.body;
-
   if (!title || !assignedVolunteer || !eventId) {
     return res.status(400).json({ message: 'title, assignedVolunteer and eventId are required' });
   }
 
-  const [volunteer, event] = await Promise.all([
-    User.findOne({ _id: assignedVolunteer, role: 'volunteer' }),
-    Event.findById(eventId),
+  const [{ data: volunteer }, { data: event }] = await Promise.all([
+    supabase.from('users').select('id').eq('id', assignedVolunteer).eq('role', 'volunteer').maybeSingle(),
+    supabase.from('events').select('id').eq('id', eventId).maybeSingle(),
   ]);
 
-  if (!volunteer) {
-    return res.status(404).json({ message: 'Assigned volunteer not found' });
-  }
+  if (!volunteer) return res.status(404).json({ message: 'Assigned volunteer not found' });
+  if (!event) return res.status(404).json({ message: 'Event not found' });
 
-  if (!event) {
-    return res.status(404).json({ message: 'Event not found' });
-  }
+  const { data: task, error: taskError } = await supabase
+    .from('tasks')
+    .insert({
+      title,
+      description: description || '',
+      assigned_volunteer: assignedVolunteer,
+      event_id: eventId,
+      status: 'assigned',
+      created_by: req.user._id,
+    })
+    .select('*')
+    .single();
+  if (taskError) return res.status(400).json({ message: taskError.message });
 
-  const task = await Task.create({
-    title,
-    description: description || '',
-    assignedVolunteer,
-    eventId,
-    status: 'assigned',
-    createdBy: req.user._id,
-  });
-
-  await Notification.create({
-    userId: volunteer._id,
+  await supabase.from('notifications').insert({
+    user_id: assignedVolunteer,
     message: `Task assigned: ${title}`,
     type: 'info',
   });
 
   emitRealtimeEvent('task:assigned', {
-    taskId: task._id,
-    assignedVolunteer: volunteer._id,
-    eventId: event._id,
+    taskId: task.id,
+    assignedVolunteer,
+    eventId,
     title: task.title,
   });
 
-  res.status(201).json(task);
+  res.status(201).json(mapTask(task));
 };
 
 const transitionTask = async (req, res, status) => {
-  const task = await Task.findById(req.params.id || req.body.taskId);
-  if (!task) {
-    return res.status(404).json({ message: 'Task not found' });
-  }
+  const targetId = req.params.id || req.body.taskId;
+  const { data: task, error: taskError } = await supabase.from('tasks').select('*').eq('id', targetId).maybeSingle();
+  if (taskError) return res.status(400).json({ message: taskError.message });
+  if (!task) return res.status(404).json({ message: 'Task not found' });
 
-  if (req.user.role !== 'admin' && task.assignedVolunteer.toString() !== req.user._id.toString()) {
+  if (req.user.role !== 'admin' && String(task.assigned_volunteer) !== String(req.user._id)) {
     return res.status(403).json({ message: 'Insufficient permissions' });
   }
 
-  task.status = status;
-  await task.save();
+  const { data: updatedTask, error: updateTaskError } = await supabase
+    .from('tasks')
+    .update({ status })
+    .eq('id', targetId)
+    .select('*')
+    .single();
+  if (updateTaskError) return res.status(400).json({ message: updateTaskError.message });
 
   if (status === 'active') {
-    await User.findByIdAndUpdate(task.assignedVolunteer, {
-      dutyStatus: 'on-duty',
-      availability: true,
-    });
+    await supabase
+      .from('users')
+      .update({ duty_status: 'on-duty', availability: true })
+      .eq('id', updatedTask.assigned_volunteer);
   }
 
   if (status === 'rejected') {
-    await User.findByIdAndUpdate(task.assignedVolunteer, {
-      dutyStatus: 'off-duty',
-      availability: false,
-    });
+    await supabase
+      .from('users')
+      .update({ duty_status: 'off-duty', availability: false })
+      .eq('id', updatedTask.assigned_volunteer);
   }
 
   emitRealtimeEvent('task:status-updated', {
-    taskId: task._id,
-    status: task.status,
-    volunteerId: task.assignedVolunteer,
+    taskId: updatedTask.id,
+    status: updatedTask.status,
+    volunteerId: updatedTask.assigned_volunteer,
   });
 
-  res.json(task);
+  res.json(mapTask(updatedTask));
 };
 
 export const acceptTask = async (req, res) => transitionTask(req, res, 'active');

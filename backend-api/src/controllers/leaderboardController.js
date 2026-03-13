@@ -1,4 +1,4 @@
-import { User } from '../models/User.js';
+import { supabase } from '../config/supabase.js';
 
 const computeRankScore = (volunteer) => {
   const impact = volunteer.impactScore || 0;
@@ -9,21 +9,27 @@ const computeRankScore = (volunteer) => {
 };
 
 export const getLeaderboard = async (_req, res) => {
-  const volunteers = await User.find({ role: 'volunteer' }).select(
-    'name email impactScore eventsJoined hoursContributed status location'
-  );
+  const { data: volunteers = [], error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('role', 'volunteer');
+  if (error) return res.status(400).json({ message: error.message });
 
   const ranked = volunteers
     .map((volunteer) => ({
-      volunteerId: volunteer._id,
+      volunteerId: volunteer.id,
       name: volunteer.name,
       email: volunteer.email,
-      impactScore: volunteer.impactScore || 0,
-      eventsJoined: volunteer.eventsJoined || 0,
-      hoursContributed: volunteer.hoursContributed || 0,
+      impactScore: volunteer.impact_score ?? 0,
+      eventsJoined: volunteer.events_joined ?? 0,
+      hoursContributed: volunteer.hours_contributed ?? 0,
       status: volunteer.status,
       location: volunteer.location,
-      rankScore: computeRankScore(volunteer),
+      rankScore: computeRankScore({
+        impactScore: volunteer.impact_score ?? 0,
+        eventsJoined: volunteer.events_joined ?? 0,
+        hoursContributed: volunteer.hours_contributed ?? 0,
+      }),
     }))
     .sort((a, b) => b.rankScore - a.rankScore)
     .map((item, index) => ({ ...item, rank: index + 1 }));

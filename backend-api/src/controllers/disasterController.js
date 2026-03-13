@@ -1,20 +1,20 @@
-import { Disaster } from '../models/Disaster.js';
-import { Notification } from '../models/Notification.js';
-import { User } from '../models/User.js';
+import { supabase } from '../config/supabase.js';
 import { emitRealtimeEvent } from '../services/socketService.js';
 
+const mapDisaster = (item) => ({
+  ...item,
+  _id: item.id,
+  createdBy: item.created_by,
+  detectedAt: item.detected_at,
+  createdAt: item.created_at,
+});
+
 export const getDisasters = async (req, res) => {
-  const query = {};
-  if (req.query.status) {
-    query.status = req.query.status;
-  }
-
-  const disasters = await Disaster.find(query)
-    .populate('createdBy', 'name email')
-    .sort({ detectedAt: -1 })
-    .limit(200);
-
-  res.json(disasters);
+  let query = supabase.from('disasters').select('*').order('detected_at', { ascending: false }).limit(200);
+  if (req.query.status) query = query.eq('status', req.query.status);
+  const { data = [], error } = await query;
+  if (error) return res.status(400).json({ message: error.message });
+  res.json(data.map(mapDisaster));
 };
 
 export const createDisaster = async (req, res) => {
@@ -23,26 +23,38 @@ export const createDisaster = async (req, res) => {
     return res.status(400).json({ message: 'type and location are required' });
   }
 
-  const disaster = await Disaster.create({
-    type,
-    location,
-    severity: severity || 'medium',
-    detectedAt: detectedAt || new Date(),
-    createdBy: req.user._id,
-    coordinates: coordinates || undefined,
-  });
+  const { data: disaster, error: disasterError } = await supabase
+    .from('disasters')
+    .insert({
+      type,
+      location,
+      severity: severity || 'medium',
+      detected_at: detectedAt || new Date().toISOString(),
+      created_by: req.user._id,
+      coordinates: coordinates || null,
+      status: 'active',
+    })
+    .select('*')
+    .single();
+  if (disasterError) return res.status(400).json({ message: disasterError.message });
 
-  const volunteers = await User.find({ role: 'volunteer', status: 'approved' }).select('_id location');
+  const { data: volunteers = [] } = await supabase
+    .from('users')
+    .select('id')
+    .eq('role', 'volunteer')
+    .eq('status', 'approved');
 
   if (volunteers.length) {
-    const docs = volunteers.map((volunteer) => ({
-      userId: volunteer._id,
-      message: `Disaster alert: ${disaster.type} reported at ${disaster.location}`,
-      type: 'alert',
-    }));
-    await Notification.insertMany(docs);
+    await supabase.from('notifications').insert(
+      volunteers.map((volunteer) => ({
+        user_id: volunteer.id,
+        message: `Disaster alert: ${disaster.type} reported at ${disaster.location}`,
+        type: 'alert',
+      }))
+    );
   }
 
-  emitRealtimeEvent('disaster:alert', disaster);
-  res.status(201).json(disaster);
+  const mapped = mapDisaster(disaster);
+  emitRealtimeEvent('disaster:alert', mapped);
+  res.status(201).json(mapped);
 };

@@ -4,8 +4,7 @@ import {
   recommendVolunteers,
 } from '../services/aiService.js';
 import Groq from 'groq-sdk';
-import { Disaster } from '../models/Disaster.js';
-import { Event } from '../models/Event.js';
+import { supabase } from '../config/supabase.js';
 
 const groqClient = process.env.GROQ_API_KEY
   ? new Groq({ apiKey: process.env.GROQ_API_KEY })
@@ -40,13 +39,17 @@ export const getResourcePrediction = async (_req, res) => {
 export const getVolunteerAiInsights = async (req, res) => {
   const volunteerRecommendations = await recommendVolunteers({ location: req.user.location || '' });
   const [upcomingEvents, activeDisasters] = await Promise.all([
-    Event.find({ status: { $in: ['planned', 'active'] } })
-      .select('title location date')
-      .sort({ date: 1 })
+    supabase
+      .from('events')
+      .select('id,title,location,date')
+      .in('status', ['planned', 'active'])
+      .order('date', { ascending: true })
       .limit(5),
-    Disaster.find({ status: 'active' })
-      .select('type location severity detectedAt')
-      .sort({ detectedAt: -1 })
+    supabase
+      .from('disasters')
+      .select('id,type,location,severity,detected_at')
+      .eq('status', 'active')
+      .order('detected_at', { ascending: false })
       .limit(5),
   ]);
 
@@ -81,8 +84,8 @@ export const getVolunteerAiInsights = async (req, res) => {
     success,
     insight,
     fallbackRecommendations: defaultFallbackRecommendations,
-    suggestedEvents: upcomingEvents.map((event) => ({
-      id: event._id,
+    suggestedEvents: (upcomingEvents.data || []).map((event) => ({
+      id: event.id,
       title: event.title,
       location: event.location,
       date: event.date,
@@ -92,6 +95,9 @@ export const getVolunteerAiInsights = async (req, res) => {
       recommendationScore: item.recommendationScore,
       suggestedRole: (item.skills || [])[0] || 'Field Volunteer',
     })),
-    disasterAlerts: activeDisasters,
+    disasterAlerts: (activeDisasters.data || []).map((item) => ({
+      ...item,
+      detectedAt: item.detected_at,
+    })),
   });
 };

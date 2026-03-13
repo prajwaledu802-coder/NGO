@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import { connectDb } from '../config/db.js';
 import { ensureSeedUsers } from '../services/seedUsersService.js';
 
@@ -11,16 +10,10 @@ const run = async () => {
   console.log(
     `Seed users ensured. created=${result.created}, totalExpected=${result.totalSeedUsers}`
   );
-  await mongoose.connection.close();
   process.exit(0);
 };
 
 run().catch(async (error) => {
   console.error(error);
-  try {
-    await mongoose.connection.close();
-  } catch {
-    // no-op
-  }
   process.exit(1);
 });
