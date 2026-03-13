@@ -8,9 +8,11 @@ import { connectDb } from './config/db.js';
 import { ensureSeedUsers } from './services/seedUsersService.js';
 import { setSocketServer } from './services/socketService.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
-dotenv.config();
+const srcDir = path.dirname(fileURLToPath(import.meta.url));
+const envLoadResult = dotenv.config({ path: path.resolve(srcDir, '../.env') });
+if (envLoadResult.error) {
+  dotenv.config();
+}
 
 const port = process.env.PORT || 5000;
 
