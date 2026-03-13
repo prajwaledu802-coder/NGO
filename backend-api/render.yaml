@@ -3,6 +3,7 @@ services:
     name: helphive-backend-api
     env: node
     plan: free
+    rootDir: .
     buildCommand: npm install
     startCommand: npm start
     envVars:
@@ -11,10 +12,10 @@ services:
       - key: PORT
         value: 10000
       - key: MONGO_URI
-        sync: false
+        sync: false          # ⚠️  Set this manually in Render → Environment
       - key: JWT_SECRET
-        sync: false
+        sync: false          # ⚠️  Set this manually in Render → Environment
       - key: CLIENT_URLS
-        sync: false
+        sync: false          # Comma-separated list of your frontend URLs
       - key: GROQ_API_KEY
-        sync: false
+        sync: false          # Optional: Groq AI integration

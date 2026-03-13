@@ -12,8 +12,19 @@ dotenv.config();
 const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET'];
 const missingVars = requiredEnvVars.filter(v => !process.env[v]);
 if (missingVars.length > 0) {
-  console.error(`❌ Missing required environment variables: ${missingVars.join(', ')}`);
-  console.error('Please set these in your .env file or deployment environment.');
+  console.error('');
+  console.error('❌ Missing required environment variables:');
+  missingVars.forEach(v => console.error(`   - ${v}`));
+  console.error('');
+  console.error('👉 To fix on Render:');
+  console.error('   1. Open your Render service → Environment → Add Environment Variable');
+  console.error('   2. Set MONGO_URI  to your MongoDB Atlas connection string');
+  console.error('      e.g. mongodb+srv://<user>:<password>@cluster0.xxxxx.mongodb.net/helphive');
+  console.error('   3. Set JWT_SECRET to a long random string (e.g. run: openssl rand -hex 32)');
+  console.error('   4. Trigger a manual deploy in Render after saving the variables.');
+  console.error('');
+  console.error('👉 For local development copy .env.example → .env and fill in the values.');
+  console.error('');
   process.exit(1);
 }
 
