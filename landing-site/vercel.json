@@ -1,0 +1,11 @@
+{
+  "installCommand": "npm --prefix NGO/client install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "NGO/client/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
