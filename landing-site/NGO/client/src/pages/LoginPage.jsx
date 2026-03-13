@@ -94,6 +94,9 @@ const LoginPage = () => {
         </div>
 
         {error && <p className="mt-3 text-sm text-red-500 font-medium">{error}</p>}
+        <p className="mt-3 text-center text-xs text-text-tertiary">
+          Demo sign-in for Vercel: admin@123 / 2580 and volunteer@123 / 2580
+        </p>
 
         <AnimatedButton type="submit" className="mt-8 w-full !bg-accent-primary shadow-lg shadow-accent-primary/20 hover:shadow-accent-primary/30">
           Sign In
