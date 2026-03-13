@@ -41,7 +41,7 @@ Create a Web Service for **backend-api**:
 - Build Command: `npm install`
 - Start Command: `npm run start`
 - Required Environment Variables:
-  - `MONGO_URI`
+  - `MONGO_URI` (or `MONGODB_URI` / `DATABASE_URL`)
   - `JWT_SECRET`
   - `PORT`
   - `GROQ_API_KEY`
