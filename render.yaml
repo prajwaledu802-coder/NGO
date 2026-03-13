@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: helphive-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false   # Set this in the Render dashboard → Environment tab
+      - key: JWT_SECRET
+        sync: false   # Set this in the Render dashboard → Environment tab
+      - key: CLIENT_URL
+        sync: false   # Set to your deployed frontend URL
+      - key: GROQ_API_KEY
+        sync: false   # Optional – AI features
+      - key: OPENAI_API_KEY
+        sync: false   # Optional – AI features
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
