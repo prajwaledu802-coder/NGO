@@ -3,6 +3,7 @@ import { api } from '../services/api';
 
 const AuthContext = createContext(null);
 const DEMO_KEY = 'ngo_demo_user';
+const demoCredentials = { email: 'volunteer@123', password: '2580' };
 
 const getStoredDemoUser = () => {
   const raw = localStorage.getItem(DEMO_KEY);
@@ -34,6 +35,11 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
+    if (email === demoCredentials.email && password === demoCredentials.password) {
+      loginAsDemo();
+      return;
+    }
+
     const { data } = await api.post('/auth/login', { email, password });
     localStorage.setItem('ngo_token', data.token);
     localStorage.removeItem(DEMO_KEY);

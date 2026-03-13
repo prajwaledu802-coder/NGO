@@ -98,7 +98,7 @@ const LoginPage = () => {
           </div>
 
           <p className="pt-1 text-center text-xs text-[var(--text-muted)]">
-            Quick login uses seeded backend role users.
+            Demo credentials: admin@123 / 2580 and volunteer@123 / 2580.
           </p>
           <p className="text-center text-xs text-[var(--text-secondary)]">
             New volunteer? <Link to="/register" className="font-semibold text-[var(--text-primary)]">Register here</Link>

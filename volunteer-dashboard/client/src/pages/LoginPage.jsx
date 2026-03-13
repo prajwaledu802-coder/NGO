@@ -66,6 +66,7 @@ const LoginPage = () => {
         >
           Continue In Demo Mode
         </button>
+        <p className="mt-3 text-center text-xs text-slate-400">Demo credentials: volunteer@123 / 2580</p>
 
         <p className="mt-4 text-center text-sm text-slate-300">
           New here? <Link to="/register" className="text-blue-300">Create account</Link>

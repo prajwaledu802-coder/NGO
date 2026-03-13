@@ -4,8 +4,8 @@ import { api } from '../services/api';
 const AuthContext = createContext(null);
 const OFFLINE_USER_KEY = 'ngo_offline_user';
 const demoCredentials = {
-  admin: { email: 'admin@helphive.org', password: 'Admin@123' },
-  volunteer: { email: 'aarav@example.com', password: 'Volunteer@123' },
+  admin: { email: 'admin@123', password: '2580' },
+  volunteer: { email: 'volunteer@123', password: '2580' },
 };
 
 const offlineRoleUsers = {
@@ -14,7 +14,7 @@ const offlineRoleUsers = {
     _id: 'offline-admin',
     name: 'HelpHive Admin',
     fullName: 'HelpHive Admin',
-    email: 'admin@helphive.org',
+    email: 'admin@123',
     role: 'admin',
     status: 'approved',
   },
@@ -23,7 +23,7 @@ const offlineRoleUsers = {
     _id: 'offline-volunteer',
     name: 'HelpHive Volunteer',
     fullName: 'HelpHive Volunteer',
-    email: 'aarav@example.com',
+    email: 'volunteer@123',
     role: 'volunteer',
     status: 'approved',
     dutyStatus: 'off-duty',
@@ -69,6 +69,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
+    if (email === demoCredentials.admin.email && password === demoCredentials.admin.password) {
+      loginOfflineByRole('admin');
+      return;
+    }
+    if (email === demoCredentials.volunteer.email && password === demoCredentials.volunteer.password) {
+      loginOfflineByRole('volunteer');
+      return;
+    }
+
     const { data } = await api.post('/auth/login', { email, password });
     localStorage.removeItem(OFFLINE_USER_KEY);
     localStorage.setItem('ngo_token', data.token);
