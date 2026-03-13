@@ -1,0 +1,9 @@
+{
+  "name": "client-compat",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix ../landing-site/NGO/client run dev",
+    "build": "npm --prefix ../landing-site/NGO/client install && npm --prefix ../landing-site/NGO/client run build -- --outDir ../../../client/dist",
+    "lint": "npm --prefix ../landing-site/NGO/client install && npm --prefix ../landing-site/NGO/client run lint"
+  }
+}
