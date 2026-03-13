@@ -69,14 +69,14 @@ export default function Navbar() {
         {/* CTA Buttons */}
         <div className="hidden items-center gap-4 md:flex">
           <Link
-            to="/login"
+            to="/login?role=admin"
             className="cursor-pointer text-sm font-medium text-text-secondary transition-colors duration-300 hover:text-text-primary"
           >
-            Login
+            Admin Login
           </Link>
           <motion.div whileHover={{ y: -2, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Link to="/register" className="btn-primary block px-5 py-2.5 text-sm !bg-none !bg-accent-primary hover:!bg-accent-primary/90">
-              Get Started
+            <Link to="/register?role=volunteer" className="btn-primary block px-5 py-2.5 text-sm !bg-none !bg-accent-primary hover:!bg-accent-primary/90">
+              Volunteer Signup
             </Link>
           </motion.div>
         </div>
@@ -116,18 +116,18 @@ export default function Navbar() {
             <div className="my-2 h-px w-full bg-black/5" />
             <div className="flex flex-col gap-3 px-2 pb-2">
               <Link
-                to="/login"
+                to="/login?role=admin"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="cursor-pointer rounded-lg px-2 py-2 text-center text-base font-medium text-text-primary transition-colors hover:bg-black/5"
               >
-                Login
+                Admin Login
               </Link>
               <Link
-                to="/register"
+                to="/register?role=volunteer"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="btn-primary w-full text-center text-base !bg-none !bg-accent-primary"
               >
-                Get Started
+                Volunteer Signup
               </Link>
             </div>
           </motion.div>

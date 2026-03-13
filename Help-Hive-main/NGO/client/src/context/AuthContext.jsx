@@ -24,12 +24,14 @@ export const AuthProvider = ({ children }) => {
     const { data } = await api.post('/auth/login', { email, password });
     localStorage.setItem('ngo_token', data.token);
     setUser(data.user);
+    return data.user;
   };
 
   const register = async (payload) => {
     const { data } = await api.post('/auth/register', payload);
     localStorage.setItem('ngo_token', data.token);
     setUser(data.user);
+    return data.user;
   };
 
   const logout = () => {

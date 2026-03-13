@@ -24,9 +24,13 @@ export default function CTASection() {
               Join hundreds of organizations saving time and maximizing their impact with HelpHive.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-sm">
-              <Link to="/register" className="btn-primary w-full flex items-center justify-center gap-2 group flex-1 !bg-none !bg-accent-primary hover:!bg-accent-primary/90">
-                Get Started Now
+            <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-2xl">
+              <Link to="/register?role=volunteer" className="btn-primary w-full flex items-center justify-center gap-2 group flex-1 !bg-none !bg-accent-primary hover:!bg-accent-primary/90">
+                Join As Volunteer
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link to="/login?role=admin" className="w-full flex items-center justify-center gap-2 group flex-1 rounded-2xl border border-black/10 bg-white px-6 py-3 text-text-primary font-semibold hover:bg-black/[0.02] transition-colors">
+                Admin Sign In
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
