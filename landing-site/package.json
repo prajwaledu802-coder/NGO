@@ -1,0 +1,10 @@
+{
+  "name": "landing-site",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix NGO/client run dev",
+    "build": "npm --prefix NGO/client install && npm --prefix NGO/client run build",
+    "lint": "npm --prefix NGO/client run lint",
+    "preview": "npm --prefix NGO/client run preview"
+  }
+}
