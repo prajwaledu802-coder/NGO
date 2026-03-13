@@ -4,6 +4,8 @@ import AppLayout from './components/layout/AppLayout';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import PageSkeleton from './components/loader/PageSkeleton';
 import LoginPage from './pages/LoginPage';
+import LandingPage from './pages/LandingPage';
+import RegisterPage from './pages/RegisterPage';
 
 const AdminDashboardPage = lazy(() => import('./pages/DashboardPage'));
 const VolunteersPage = lazy(() => import('./pages/VolunteersPage'));
@@ -22,7 +24,9 @@ const withSuspense = (Component) => (
 
 const App = () => (
   <Routes>
+    <Route path="/" element={<LandingPage />} />
     <Route path="/login" element={<LoginPage />} />
+    <Route path="/register" element={<RegisterPage />} />
 
     <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
       <Route element={<AppLayout />}>
@@ -37,8 +41,7 @@ const App = () => (
       </Route>
     </Route>
 
-    <Route path="/" element={<Navigate to="/login" replace />} />
-    <Route path="*" element={<Navigate to="/login" replace />} />
+    <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );
 
