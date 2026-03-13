@@ -1,5 +1,6 @@
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/User.js';
+import { supabase } from '../config/supabase.js';
 
 const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
@@ -9,29 +10,36 @@ export const register = async (req, res) => {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
-  const exists = await User.findOne({ email });
+  const { data: exists } = await supabase.from('users').select('id').eq('email', email).maybeSingle();
   if (exists) {
     return res.status(400).json({ message: 'Email already in use' });
   }
 
-  const user = await User.create({ fullName, email, password });
+  const salt = await bcrypt.genSalt(10);
+  const passwordHash = await bcrypt.hash(password, salt);
+  const { data: user, error } = await supabase
+    .from('users')
+    .insert({ full_name: fullName, email, password: passwordHash, role: 'coordinator' })
+    .select('*')
+    .single();
+  if (error) return res.status(400).json({ message: error.message });
   res.status(201).json({
-    token: signToken(user._id),
-    user: { id: user._id, fullName: user.fullName, email: user.email },
+    token: signToken(user.id),
+    user: { id: user.id, fullName: user.full_name || user.fullName, email: user.email },
   });
 };
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  const { data: user } = await supabase.from('users').select('*').eq('email', email).maybeSingle();
 
-  if (!user || !(await user.matchPassword(password))) {
+  if (!user || !(await bcrypt.compare(password, user.password || ''))) {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
   res.json({
-    token: signToken(user._id),
-    user: { id: user._id, fullName: user.fullName, email: user.email },
+    token: signToken(user.id),
+    user: { id: user.id, fullName: user.full_name || user.fullName, email: user.email },
   });
 };
 

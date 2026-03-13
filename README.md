@@ -41,8 +41,8 @@ Create a Web Service for **backend-api**:
 - Build Command: `npm install`
 - Start Command: `npm run start`
 - Required Environment Variables:
-  - `MONGO_URI` (or `MONGODB_URI` / `DATABASE_URL`)
-    - Use a full MongoDB URI (example: `mongodb+srv://<user>:<password>@<cluster>/<db>?retryWrites=true&w=majority`)
+  - `SUPABASE_URL`
+  - `SUPABASE_SERVICE_ROLE_KEY` (or `SUPABASE_ANON_KEY`)
   - `JWT_SECRET`
   - `PORT`
   - `GROQ_API_KEY`

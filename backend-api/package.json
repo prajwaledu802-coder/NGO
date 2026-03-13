@@ -10,6 +10,7 @@
     "seed:users": "node src/seed/ensureSeedUsers.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",

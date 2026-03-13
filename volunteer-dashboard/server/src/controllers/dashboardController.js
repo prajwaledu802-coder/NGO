@@ -1,16 +1,17 @@
-import { Event } from '../models/Event.js';
-import { Resource } from '../models/Resource.js';
-import { Volunteer } from '../models/Volunteer.js';
+import { supabase } from '../config/supabase.js';
 
 export const getDashboardOverview = async (_req, res) => {
-  const [volunteers, events, resources] = await Promise.all([
-    Volunteer.find(),
-    Event.find(),
-    Resource.find(),
+  const [{ data: volunteers = [] }, { data: events = [] }, { data: resources = [] }] = await Promise.all([
+    supabase.from('volunteers').select('*'),
+    supabase.from('events').select('*'),
+    supabase.from('resources').select('*'),
   ]);
 
-  const totalHours = volunteers.reduce((sum, v) => sum + (v.hoursContributed || 0), 0);
-  const availableResources = resources.filter((r) => r.status === 'Available').length;
+  const totalHours = volunteers.reduce(
+    (sum, v) => sum + (v.hours_contributed ?? v.hoursContributed ?? 0),
+    0
+  );
+  const availableResources = resources.filter((r) => (r.status || '').toLowerCase() === 'available').length;
 
   const activitySeries = [
     { name: 'Mon', volunteers: Math.max(1, Math.round(volunteers.length * 0.2)) },
@@ -22,7 +23,7 @@ export const getDashboardOverview = async (_req, res) => {
     { name: 'Sun', volunteers: Math.max(1, Math.round(volunteers.length * 0.6)) },
   ];
 
-  const resourceSeries = resources.map((r) => ({ name: r.name, quantity: r.quantity }));
+  const resourceSeries = resources.map((r) => ({ name: r.name || r.resource_name, quantity: r.quantity }));
 
   res.json({
     metrics: {

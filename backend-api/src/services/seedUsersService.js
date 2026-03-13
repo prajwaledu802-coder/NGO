@@ -1,4 +1,5 @@
-import { User } from '../models/User.js';
+import bcrypt from 'bcryptjs';
+import { supabase } from '../config/supabase.js';
 import { seedUsers } from '../seed/seedData.js';
 
 export const ensureSeedUsers = async () => {
@@ -6,11 +7,14 @@ export const ensureSeedUsers = async () => {
   let created = 0;
 
   for (const userData of roleSeedUsers) {
-    const existing = await User.findOne({ email: userData.email }).select('_id');
+    const { data: existing } = await supabase.from('users').select('id').eq('email', userData.email).maybeSingle();
     if (existing) continue;
 
-    await User.create({
+    const salt = await bcrypt.genSalt(10);
+    const password = await bcrypt.hash(userData.password, salt);
+    await supabase.from('users').insert({
       ...userData,
+      password,
       status: userData.status || 'approved',
     });
     created += 1;
