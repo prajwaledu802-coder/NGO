@@ -263,3 +263,14 @@ body,
 .timeline-dot-pulse {
   animation: timelineDotPulse 2s ease-out infinite;
 }
+
+/* TiltCard shadow utility */
+.shadow-glow {
+  box-shadow: 0 8px 32px -8px color-mix(in srgb, var(--accent-primary) 30%, transparent);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.shadow-glow:hover {
+  box-shadow: 0 18px 44px -12px color-mix(in srgb, var(--accent-primary) 42%, transparent);
+}
+

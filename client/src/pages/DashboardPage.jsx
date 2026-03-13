@@ -602,8 +602,8 @@ const DashboardPage = () => {
             { to: '/resources', label: 'Resources' },
             { to: '/map-tracking', label: 'Map Tracking' },
             { to: '/ai', label: 'AI Insights' },
-            { to: 'help-requests', label: 'Help Requests' },
-            { to: 'emergency', label: 'Emergency Mode' },
+            { to: '/help-requests', label: 'Help Requests' },
+            { to: '/emergency', label: 'Emergency Mode' },
           ].map((link) => (
             <StaggerItem key={link.to}>
               <Link

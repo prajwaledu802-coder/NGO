@@ -1,10 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  Award,
   BarChart3,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
   CircleUserRound,
+  ClipboardList,
   Compass,
   Gauge,
   Hexagon,
@@ -13,6 +15,7 @@ import {
   Menu,
   Package,
   Settings,
+  Star,
   Users,
   X,
 } from 'lucide-react';
@@ -32,8 +35,11 @@ const adminLinks = [
 const volunteerLinks = [
   { to: '/volunteer-dashboard', label: 'Dashboard', icon: Gauge },
   { to: '/events', label: 'Events', icon: CalendarDays },
+  { to: '/my-activities', label: 'My Activities', icon: ClipboardList },
   { to: '/map-tracking', label: 'Map Tracking', icon: Compass },
   { to: '/leaderboard', label: 'Leaderboard', icon: Medal },
+  { to: '/impact', label: 'Impact Score', icon: Star },
+  { to: '/certificates', label: 'Certificates', icon: Award },
   { to: '/ai', label: 'AI Insights', icon: Lightbulb },
   { to: '/profile', label: 'Profile', icon: CircleUserRound },
   { to: '/settings', label: 'Settings', icon: Settings },

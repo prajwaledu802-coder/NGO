@@ -1,6 +1,7 @@
 import 'express-async-errors';
 import cors from 'cors';
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import { aiRouter } from './routes/aiRoutes.js';
 import { activityRouter } from './routes/activityRoutes.js';
 import { analyticsRouter } from './routes/analyticsRoutes.js';
@@ -19,9 +20,18 @@ import { volunteerDashboardRouter } from './routes/volunteerDashboardRoutes.js';
 import { eventRouter } from './routes/eventRoutes.js';
 import { resourceRouter } from './routes/resourceRoutes.js';
 import { dashboardRouter } from './routes/dashboardRoutes.js';
+import { mapDataRouter } from './routes/mapDataRoutes.js';
+import { getImpact, getCertificate } from './controllers/volunteerSelfController.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 const app = express();
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 app.use(
   cors({
@@ -30,6 +40,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use('/api', apiLimiter);
 
 app.get('/api/health', (_, res) => {
   res.json({ status: 'ok' });
@@ -52,6 +63,9 @@ app.use('/api/help-requests', helpRequestRouter);
 app.use('/api/tasks', taskRouter);
 app.use('/api/disaster', disasterRouter);
 app.use('/api/volunteer', volunteerDashboardRouter);
+app.use('/api/map-data', mapDataRouter);
+app.get('/api/volunteer/impact', protect, getImpact);
+app.get('/api/volunteer/certificate', protect, getCertificate);
 app.post('/api/ai-insights', protect, getVolunteerAiInsights);
 
 app.use(notFound);
