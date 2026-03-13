@@ -109,10 +109,16 @@ const VolunteersPage = () => {
   };
 
   const handleApprove = (volunteerId) => {
-    setVolunteers((prev) => 
+    setVolunteers((prev) =>
       prev.map(v => v._id === volunteerId ? { ...v, status: 'approved' } : v)
     );
-    api.put(`/volunteers/${volunteerId}/approve`).catch(() => {});
+    api.put(`/volunteers/${volunteerId}/approve`).catch((err) => {
+      // Revert optimistic update on failure
+      setVolunteers((prev) =>
+        prev.map(v => v._id === volunteerId ? { ...v, status: 'pending' } : v)
+      );
+      setError(err?.response?.data?.message || 'Unable to approve volunteer. Please try again.');
+    });
   };
 
   return (
