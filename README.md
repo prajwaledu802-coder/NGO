@@ -59,7 +59,19 @@ npm run dev
 
 ### Backend → Render
 
-1. Connect this GitHub repo to Render
+**Option A — Render Blueprint (recommended, auto-configures everything):**
+
+1. In the Render Dashboard click **New → Blueprint**
+2. Connect this GitHub repo — Render will detect `render.yaml` at the repo root
+3. Before deploying, set the secret environment variables in the Render UI:
+   - `MONGO_URI` — MongoDB Atlas connection string  
+     (Atlas → Clusters → Connect → Drivers → copy the `mongodb+srv://...` URL)
+   - `JWT_SECRET` — a long random string (`openssl rand -hex 32`)
+4. Click **Apply** / **Deploy**
+
+**Option B — Manual service setup:**
+
+1. Connect this GitHub repo to Render → New Web Service
 2. Set **Root Directory** to `backend-api`
 3. Build command: `npm install`
 4. Start command: `npm start`
@@ -67,7 +79,7 @@ npm run dev
    - `MONGO_URI` — MongoDB Atlas connection string
    - `JWT_SECRET` — Strong secret key
    - `CLIENT_URLS` — Comma-separated frontend URLs
-   - `GROQ_API_KEY` — Groq API key
+   - `GROQ_API_KEY` — Groq API key (optional)
 
 ### Frontends → Vercel
 

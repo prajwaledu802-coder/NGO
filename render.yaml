@@ -1,0 +1,35 @@
+# Render Blueprint — HelpHive Platform
+#
+# Render reads this file from the repository root.
+# It deploys the backend-api service from the backend-api/ subdirectory.
+#
+# ⚠️  Before your first deploy you MUST set these environment variables
+#     in the Render Dashboard → Your Service → Environment:
+#
+#   MONGO_URI   — MongoDB Atlas connection string
+#                 e.g. mongodb+srv://<user>:<pass>@cluster0.xxxxx.mongodb.net/helphive
+#   JWT_SECRET  — Long random string  (generate: openssl rand -hex 32)
+#
+# After saving those variables, click "Manual Deploy" to trigger a new deploy.
+
+services:
+  - type: web
+    name: helphive-backend-api
+    env: node
+    plan: free
+    rootDir: backend-api
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false          # ⚠️  Set in Render Dashboard → Environment
+      - key: JWT_SECRET
+        sync: false          # ⚠️  Set in Render Dashboard → Environment
+      - key: CLIENT_URLS
+        sync: false          # Comma-separated list of allowed frontend origins
+      - key: GROQ_API_KEY
+        sync: false          # Optional — Groq AI integration
