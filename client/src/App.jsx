@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import PageSkeleton from './components/loader/PageSkeleton';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 
@@ -20,6 +21,9 @@ const EmergencyModePage = lazy(() => import('./pages/EmergencyModePage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const VolunteerDetailsPage = lazy(() => import('./pages/VolunteerDetailsPage'));
+const ImpactScorePage = lazy(() => import('./pages/ImpactScorePage'));
+const CertificatesPage = lazy(() => import('./pages/CertificatesPage'));
+const MyActivitiesPage = lazy(() => import('./pages/MyActivitiesPage'));
 
 const withSuspense = (Component) => (
   <Suspense fallback={<PageSkeleton />}>
@@ -29,13 +33,13 @@ const withSuspense = (Component) => (
 
 const App = () => (
   <Routes>
+    {/* Public landing and auth pages */}
+    <Route path="/" element={<LandingPage />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />
-    
+
     <Route element={<ProtectedRoute />}>
       <Route element={<AppLayout />}>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        
         {/* Admin only routes */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route path="/dashboard" element={withSuspense(AdminDashboardPage)} />
@@ -51,6 +55,9 @@ const App = () => (
           <Route path="/volunteer-dashboard" element={withSuspense(VolunteerDashboardPage)} />
           <Route path="/leaderboard" element={withSuspense(LeaderboardPage)} />
           <Route path="/profile" element={withSuspense(ProfilePage)} />
+          <Route path="/my-activities" element={withSuspense(MyActivitiesPage)} />
+          <Route path="/impact" element={withSuspense(ImpactScorePage)} />
+          <Route path="/certificates" element={withSuspense(CertificatesPage)} />
         </Route>
 
         {/* Shared routes */}
@@ -58,8 +65,8 @@ const App = () => (
         <Route path="/map-tracking" element={withSuspense(MapTrackingPage)} />
         <Route path="/map" element={withSuspense(MapTrackingPage)} />
         <Route path="/ai" element={withSuspense(AIInsightsPage)} />
-        <Route path="help-requests" element={withSuspense(HelpRequestsPage)} />
-        <Route path="emergency" element={withSuspense(EmergencyModePage)} />
+        <Route path="/help-requests" element={withSuspense(HelpRequestsPage)} />
+        <Route path="/emergency" element={withSuspense(EmergencyModePage)} />
         <Route path="/settings" element={withSuspense(SettingsPage)} />
       </Route>
     </Route>
